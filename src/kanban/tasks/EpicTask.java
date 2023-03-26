@@ -37,10 +37,12 @@ public class EpicTask extends Task {
 
     public void addSubTask(SubTask subTask) {
         subTasks.add(subTask);
+        updateStatus();
     }
 
     @Override
     public void onDelete() {
         subTasks.clear();
+        updateStatus();
     }
 }

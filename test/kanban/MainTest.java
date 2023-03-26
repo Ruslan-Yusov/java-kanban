@@ -12,14 +12,13 @@ class MainTest {
     @Test
     public void main() {
         ServiceManager serviceManager = new ServiceManager();
-        int id = 1;
-        EpicTask epicTask1 = new EpicTask(id++, "epic1", " ", Status.NEW);
-        EpicTask epicTask2 = new EpicTask(id++, "epic2", " ", Status.NEW);
-        SubTask subTask11 = new SubTask(id++, "subTask1.1", " ", Status.NEW, epicTask1 );
-        SubTask subTask12 = new SubTask(id++, "subTask1.2", " ", Status.NEW, epicTask1 );
-        SubTask subTask21 = new SubTask(id++, "subTask2.1", "", Status.NEW, epicTask2);
-        Task task3 = new Task(id++, "task3", "", Status.NEW);
-        Task task4 = new Task(id, "task4", "", Status.NEW);
+        EpicTask epicTask1 = new EpicTask(serviceManager.getNextId(), "epic1", " ", Status.NEW);
+        EpicTask epicTask2 = new EpicTask(serviceManager.getNextId(), "epic2", " ", Status.NEW);
+        SubTask subTask11 = new SubTask(serviceManager.getNextId(), "subTask1.1", " ", Status.NEW, epicTask1 );
+        SubTask subTask12 = new SubTask(serviceManager.getNextId(), "subTask1.2", " ", Status.NEW, epicTask1 );
+        SubTask subTask21 = new SubTask(serviceManager.getNextId(), "subTask2.1", "", Status.NEW, epicTask2);
+        Task task3 = new Task(serviceManager.getNextId(), "task3", "", Status.NEW);
+        Task task4 = new Task(serviceManager.getNextId(), "task4", "", Status.NEW);
         serviceManager.addTasks(epicTask1, subTask11, subTask12, epicTask2, subTask21, task3, task4);
         System.out.println(serviceManager);
 
@@ -48,6 +47,8 @@ class MainTest {
         Assertions.assertNull(serviceManager.getTask(6));
         Assertions.assertEquals(3, serviceManager.getTasks().size());
         System.out.println(serviceManager);
+
+        Assertions.assertEquals(3, serviceManager.getAllTasks().size());
 
     }
 

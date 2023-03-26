@@ -7,12 +7,12 @@ import lombok.*;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Task {
-   protected int id;
-   protected String name;
-   protected String description;
-   @Setter(AccessLevel.PUBLIC)
-   protected Status status;
+    protected int id;
+    protected String name;
+    protected String description;
+    @Setter(AccessLevel.PUBLIC)
+    protected Status status;
 
-   public void onDelete() {
-   }
+    public void onDelete() {
+    }
 }

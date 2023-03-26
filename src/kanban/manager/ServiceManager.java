@@ -14,6 +14,11 @@ import java.util.stream.Collectors;
 @Getter
 public class ServiceManager {
     private final Map<Integer, Task> tasks = new TreeMap<>();
+    private int currentId = 1;
+
+    public int getNextId() {
+        return currentId++;
+    }
 
     public Task getTask(Integer id) {
         return tasks.get(id);
@@ -50,8 +55,8 @@ public class ServiceManager {
         }
     }
 
-    public Set<SubTask> getSubTasks(EpicTask epicTask) {
-        return (epicTask != null) ? epicTask.getSubTasks() : Collections.emptySet();
+    public List<SubTask> getSubTasks(EpicTask epicTask) {
+        return (epicTask != null) ? new ArrayList<>(epicTask.getSubTasks()) : Collections.emptyList();
     }
 
     public Task setTaskStatus(Task task, Status newStatus) {
@@ -65,6 +70,10 @@ public class ServiceManager {
         for (Task task : tasks) {
             addTask(task);
         }
+    }
+
+    public List<Task> getAllTasks() {
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
