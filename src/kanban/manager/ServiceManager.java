@@ -26,8 +26,8 @@ public class ServiceManager {
 
     public void deleteTask(Integer id) {
         Task task = tasks.get(id);
-        if(task != null) {
-            if(task instanceof EpicTask) {
+        if (task != null) {
+            if (task instanceof EpicTask) {
                 ((EpicTask) task)
                         .getSubTasks()
                         .stream()
@@ -48,7 +48,7 @@ public class ServiceManager {
     }
 
     public void updateTask(Task task) {
-        if(tasks.containsKey(task.getId())) {
+        if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
         } else {
             throw new IllegalArgumentException("Неизвестная задача");
@@ -60,7 +60,7 @@ public class ServiceManager {
     }
 
     public Task setTaskStatus(Task task, Status newStatus) {
-        if(task != null) {
+        if (task != null) {
             task.setStatus(newStatus);
         }
         return task;

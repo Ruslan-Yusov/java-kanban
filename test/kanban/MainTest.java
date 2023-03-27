@@ -14,8 +14,8 @@ class MainTest {
         ServiceManager serviceManager = new ServiceManager();
         EpicTask epicTask1 = new EpicTask(serviceManager.getNextId(), "epic1", " ", Status.NEW);
         EpicTask epicTask2 = new EpicTask(serviceManager.getNextId(), "epic2", " ", Status.NEW);
-        SubTask subTask11 = new SubTask(serviceManager.getNextId(), "subTask1.1", " ", Status.NEW, epicTask1 );
-        SubTask subTask12 = new SubTask(serviceManager.getNextId(), "subTask1.2", " ", Status.NEW, epicTask1 );
+        SubTask subTask11 = new SubTask(serviceManager.getNextId(), "subTask1.1", " ", Status.NEW, epicTask1);
+        SubTask subTask12 = new SubTask(serviceManager.getNextId(), "subTask1.2", " ", Status.NEW, epicTask1);
         SubTask subTask21 = new SubTask(serviceManager.getNextId(), "subTask2.1", "", Status.NEW, epicTask2);
         Task task3 = new Task(serviceManager.getNextId(), "task3", "", Status.NEW);
         Task task4 = new Task(serviceManager.getNextId(), "task4", "", Status.NEW);
@@ -51,6 +51,4 @@ class MainTest {
         Assertions.assertEquals(3, serviceManager.getAllTasks().size());
 
     }
-
-
 }
