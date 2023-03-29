@@ -52,11 +52,10 @@ public class ServiceManager {
     }
 
     /**
-     * Удаление по индентификатору
-     * @param id индентификатор
+     * Каскадное удаление задач из списка
+     * @param task задача
      */
-    public void deleteTask(Integer id) {
-        Task task = tasks.get(id);
+    private void deleteAnyTask(Task task) {
         if (task != null) {
             if (task instanceof EpicTask) {
                 ((EpicTask) task)
@@ -66,7 +65,40 @@ public class ServiceManager {
                         .forEach(this.tasks::remove);
             }
             task.onDelete();
-            tasks.remove(id);
+            tasks.remove(task.getId());
+        }
+    }
+
+    /**
+     * Удаление базовой задачи
+     * @param id индентификатор
+     */
+    public void deleteTask(Integer id) {
+        Task task = tasks.get(id);
+        if (task.getClass().equals(Task.class)) {
+            deleteAnyTask(task);
+        }
+    }
+
+    /**
+     * Удаление эпика
+     * @param id индентификатор
+     */
+    public void deleteSubTask(Integer id) {
+        Task task = tasks.get(id);
+        if (task instanceof SubTask) {
+            deleteAnyTask(task);
+        }
+    }
+
+    /**
+     * Удаление подзадачи
+     * @param id индентификатор
+     */
+    public void deleteEpicTask(Integer id) {
+        Task task = tasks.get(id);
+        if (task instanceof EpicTask) {
+            deleteAnyTask(task);
         }
     }
 
@@ -75,6 +107,27 @@ public class ServiceManager {
      */
     public void clearAllTasks() {
         tasks.clear();
+    }
+
+    /**
+     * Удаление всех задач ({@link Task})
+     */
+    public void clearTasks() {
+        tasks.values().stream().filter(t -> Task.class.equals(t.getClass())).forEach(this::deleteAnyTask);
+    }
+
+    /**
+     * Удаление всех подзадач ({@link SubTask})
+     */
+    public void clearSubTasks() {
+        tasks.values().stream().filter(SubTask.class::isInstance).forEach(this::deleteAnyTask);
+    }
+
+    /**
+     * Удаление всех эпиков ({@link EpicTask})
+     */
+    public void clearEpicTasks() {
+        tasks.values().stream().filter(EpicTask.class::isInstance).forEach(this::deleteAnyTask);
     }
 
     /**

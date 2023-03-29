@@ -3,8 +3,6 @@ package kanban.tasks;
 import lombok.*;
 
 @Data
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Task {
 
     private int id;

@@ -16,6 +16,7 @@ public class SubTask extends Task {
     @Override
     public void onDelete() {
         epicTask.getSubTasks().remove(this);
+        epicTask.updateStatus();
     }
 
     @Override

@@ -41,6 +41,8 @@ class MainTest {
         System.out.println(serviceManager);
 
         serviceManager.deleteTask(1);
+        Assertions.assertNotNull(serviceManager.getTask(1));
+        serviceManager.deleteEpicTask(1);
         Assertions.assertNull(serviceManager.getTask(1));
         Assertions.assertEquals(4, serviceManager.getTasks().size());
         serviceManager.deleteTask(6);
