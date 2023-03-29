@@ -12,13 +12,13 @@ class MainTest {
     @Test
     public void main() {
         ServiceManager serviceManager = new ServiceManager();
-        EpicTask epicTask1 = new EpicTask(serviceManager.getNextId(), "epic1", " ", Status.NEW);
-        EpicTask epicTask2 = new EpicTask(serviceManager.getNextId(), "epic2", " ", Status.NEW);
-        SubTask subTask11 = new SubTask(serviceManager.getNextId(), "subTask1.1", " ", Status.NEW, epicTask1);
-        SubTask subTask12 = new SubTask(serviceManager.getNextId(), "subTask1.2", " ", Status.NEW, epicTask1);
-        SubTask subTask21 = new SubTask(serviceManager.getNextId(), "subTask2.1", "", Status.NEW, epicTask2);
-        Task task3 = new Task(serviceManager.getNextId(), "task3", "", Status.NEW);
-        Task task4 = new Task(serviceManager.getNextId(), "task4", "", Status.NEW);
+        EpicTask epicTask1 = new EpicTask("epic1", " ", Status.NEW);
+        EpicTask epicTask2 = new EpicTask("epic2", " ", Status.NEW);
+        SubTask subTask11 = new SubTask("subTask1.1", " ", Status.NEW, epicTask1);
+        SubTask subTask12 = new SubTask("subTask1.2", " ", Status.NEW, epicTask1);
+        SubTask subTask21 = new SubTask("subTask2.1", "", Status.NEW, epicTask2);
+        Task task3 = new Task("task3", "", Status.NEW);
+        Task task4 = new Task("task4", "", Status.NEW);
         serviceManager.addTasks(epicTask1, subTask11, subTask12, epicTask2, subTask21, task3, task4);
         System.out.println(serviceManager);
 
@@ -49,6 +49,20 @@ class MainTest {
         System.out.println(serviceManager);
 
         Assertions.assertEquals(3, serviceManager.getAllTasks().size());
+
+        System.out.println(serviceManager.getEpicTask(7));
+        Assertions.assertNull(serviceManager.getEpicTask(7));
+        System.out.println(serviceManager.getEpicTask(4));
+        Assertions.assertEquals(epicTask2, serviceManager.getEpicTask(4));
+
+        System.out.println(serviceManager.getSubTask(7));
+        Assertions.assertNull(serviceManager.getSubTask(7));
+        System.out.println(serviceManager.getSubTask(5));
+        Assertions.assertEquals(subTask21, serviceManager.getSubTask(5));
+
+        serviceManager.clearAllTasks();
+        Assertions.assertEquals(0, serviceManager.getAllTasks().size());
+        System.out.println(serviceManager);
 
     }
 }

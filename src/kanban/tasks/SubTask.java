@@ -6,8 +6,8 @@ import lombok.ToString;
 public class SubTask extends Task {
     private final EpicTask epicTask;
 
-    public SubTask(int id, String name, String description, Status status, EpicTask epicTask) {
-        super(id, name, description, status);
+    public SubTask(String name, String description, Status status, EpicTask epicTask) {
+        super(name, description, status);
         this.epicTask = epicTask;
         epicTask.addSubTask(this);
     }
