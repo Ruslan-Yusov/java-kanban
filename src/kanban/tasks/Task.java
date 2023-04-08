@@ -17,6 +17,7 @@ public class Task {
     }
 
     public void onDelete() {
+        // null
     }
 
     @Override

@@ -1,6 +1,8 @@
 package kanban;
 
-import kanban.manager.ServiceManager;
+import kanban.manager.InMemoryTaskManager;
+import kanban.manager.Managers;
+import kanban.manager.TaskManager;
 import kanban.tasks.EpicTask;
 import kanban.tasks.Status;
 import kanban.tasks.SubTask;
@@ -8,10 +10,13 @@ import kanban.tasks.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 class MainTest {
     @Test
-    public void main() {
-        ServiceManager serviceManager = new ServiceManager();
+    void main() {
+        TaskManager<Task, Integer> serviceManager = Managers.getDefault(Managers.getDefaultHistory());
         EpicTask epicTask1 = new EpicTask("epic1", " ", Status.NEW);
         EpicTask epicTask2 = new EpicTask("epic2", " ", Status.NEW);
         SubTask subTask11 = new SubTask("subTask1.1", " ", Status.NEW, epicTask1);
@@ -44,23 +49,29 @@ class MainTest {
         Assertions.assertNotNull(serviceManager.getTask(1));
         serviceManager.deleteEpicTask(1);
         Assertions.assertNull(serviceManager.getTask(1));
-        Assertions.assertEquals(4, serviceManager.getTasks().size());
+        Assertions.assertEquals(4, serviceManager.getAllTasks().size());
         serviceManager.deleteTask(6);
         Assertions.assertNull(serviceManager.getTask(6));
-        Assertions.assertEquals(3, serviceManager.getTasks().size());
+        Assertions.assertEquals(3, serviceManager.getAllTasks().size());
         System.out.println(serviceManager);
 
         Assertions.assertEquals(3, serviceManager.getAllTasks().size());
 
         System.out.println(serviceManager.getEpicTask(7));
-        Assertions.assertNull(serviceManager.getEpicTask(7));
+        Assertions.assertNotNull(serviceManager.getEpicTask(7));
         System.out.println(serviceManager.getEpicTask(4));
         Assertions.assertEquals(epicTask2, serviceManager.getEpicTask(4));
 
         System.out.println(serviceManager.getSubTask(7));
-        Assertions.assertNull(serviceManager.getSubTask(7));
+        Assertions.assertNotNull(serviceManager.getSubTask(7));
         System.out.println(serviceManager.getSubTask(5));
         Assertions.assertEquals(subTask21, serviceManager.getSubTask(5));
+
+        System.out.println(serviceManager
+                .<String>getHistory()
+                .stream()
+                .collect(Collectors.joining("\n", "\n\nHistory:\n", "\n\n"))
+        );
 
         serviceManager.clearAllTasks();
         Assertions.assertEquals(0, serviceManager.getAllTasks().size());

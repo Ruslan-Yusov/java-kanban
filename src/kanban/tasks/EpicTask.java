@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Getter
 @ToString(callSuper = true)
-public class EpicTask extends Task {
+public class EpicTask extends Task implements ParentTask<SubTask> {
 
     private final Set<SubTask> subTasks = new HashSet<>();
 
