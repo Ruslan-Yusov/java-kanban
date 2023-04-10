@@ -1,6 +1,5 @@
 package kanban;
 
-import kanban.manager.InMemoryTaskManager;
 import kanban.manager.Managers;
 import kanban.manager.TaskManager;
 import kanban.tasks.EpicTask;
@@ -10,7 +9,6 @@ import kanban.tasks.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 class MainTest {
@@ -58,19 +56,20 @@ class MainTest {
         Assertions.assertEquals(3, serviceManager.getAllTasks().size());
 
         System.out.println(serviceManager.getEpicTask(7));
-        Assertions.assertNotNull(serviceManager.getEpicTask(7));
+        Assertions.assertNull(serviceManager.getEpicTask(7));
         System.out.println(serviceManager.getEpicTask(4));
         Assertions.assertEquals(epicTask2, serviceManager.getEpicTask(4));
 
         System.out.println(serviceManager.getSubTask(7));
-        Assertions.assertNotNull(serviceManager.getSubTask(7));
+        Assertions.assertNull(serviceManager.getSubTask(7));
         System.out.println(serviceManager.getSubTask(5));
         Assertions.assertEquals(subTask21, serviceManager.getSubTask(5));
 
         System.out.println(serviceManager
-                .<String>getHistory()
+                .getHistory()
                 .stream()
-                .collect(Collectors.joining("\n", "\n\nHistory:\n", "\n\n"))
+                .map(Task::toString)
+                .collect(Collectors.joining("\n", "\n\nhistory:\n", "\n\n"))
         );
 
         serviceManager.clearAllTasks();

@@ -5,9 +5,9 @@ import kanban.tasks.Task;
 import java.util.LinkedList;
 import java.util.List;
 
-public class InMemoryHistoryManager implements HistoryManager<Task, String> {
+public class InMemoryHistoryManager implements HistoryManager<Task> {
     public static final int HISTORY_SIZE = 10;
-    private final LinkedList<String> history = new LinkedList<>();
+    private final LinkedList<Task> history = new LinkedList<>();
 
     @Override
     public void add(Task task) {
@@ -15,12 +15,12 @@ public class InMemoryHistoryManager implements HistoryManager<Task, String> {
             if (history.size() == HISTORY_SIZE) {
                 history.removeFirst();
             }
-            history.add(task.toString());
+            history.add(task);
         }
     }
 
     @Override
-    public final List<String> getHistory() {
+    public final List<Task> getHistory() {
         return history;
     }
 }

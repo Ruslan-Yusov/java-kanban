@@ -11,14 +11,15 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
     public static final int HISTORY_SIZE = 10;
     private final Map<Integer, Task> tasks = new TreeMap<>();
     private int currentId = 1;
-    private final HistoryManager<Task, String> historyManager;
+    private final HistoryManager<Task> historyManager;
 
-    public InMemoryTaskManager(HistoryManager<Task, String> historyManager) {
+    public InMemoryTaskManager(HistoryManager<Task> historyManager) {
         this.historyManager = historyManager;
     }
 
     /**
      * Индентификатор
+     *
      * @return возвращает индентификатор
      */
 
@@ -34,17 +35,20 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
     }
 
     @Override
-    public <E extends Task> E  getEpicTask(Integer id) {
-        return (E) getTask(id);
+    public Task getEpicTask(Integer id) {
+        Task task = getTask(id);
+        return (task instanceof EpicTask) ? task : null;
     }
 
     @Override
-    public <S extends Task> S   getSubTask(Integer id) {
-        return (S) getTask(id);
+    public Task getSubTask(Integer id) {
+        Task task = getTask(id);
+        return (task instanceof SubTask) ? task : null;
     }
 
     /**
      * Каскадное удаление задач из списка
+     *
      * @param task задача
      */
     private void deleteAnyTask(Task task) {
@@ -155,10 +159,10 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
 
     @Override
     public <E extends ParentTask<? extends Task>> List<SubTask> getSubTasks(E epicTask) {
-       return Optional.ofNullable(epicTask)
-               .map(ParentTask::getSubTasks)
-               .map(set -> set.stream().map(SubTask.class::cast).collect(Collectors.toList()))
-               .orElseGet(Collections::emptyList);
+        return Optional.ofNullable(epicTask)
+                .map(ParentTask::getSubTasks)
+                .map(set -> set.stream().map(SubTask.class::cast).collect(Collectors.toList()))
+                .orElseGet(Collections::emptyList);
     }
 
     @Override
@@ -182,7 +186,7 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
     }
 
     @Override
-    public List<String> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 

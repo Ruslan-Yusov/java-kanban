@@ -24,7 +24,7 @@ public interface TaskManager<T, N extends Number> {
      * @param id индентификатор
      * @return объект {@link EpicTask}
      */
-    <E extends T> E getEpicTask(N id);
+    T getEpicTask(N id);
 
     /**
      * Поиск по id в {@link SubTask}
@@ -32,7 +32,7 @@ public interface TaskManager<T, N extends Number> {
      * @param id индентификатор
      * @return объект {@link SubTask}
      */
-    <S extends T> S getSubTask(N id);
+    T getSubTask(N id);
 
     /**
      * Удаление базовой задачи
@@ -152,5 +152,5 @@ public interface TaskManager<T, N extends Number> {
      *
      * @return последние просмотренные задачи
      */
-    <V> List<V> getHistory();
+    List<T> getHistory();
 }

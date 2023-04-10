@@ -2,9 +2,9 @@ package kanban.manager;
 
 import java.util.List;
 
-public interface HistoryManager<T, V> {
+public interface HistoryManager<T> {
 
     void add(T task);
 
-    List<V> getHistory();
+    List<T> getHistory();
 }
