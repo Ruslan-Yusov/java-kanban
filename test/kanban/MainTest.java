@@ -71,6 +71,17 @@ class MainTest {
                 .map(Task::toString)
                 .collect(Collectors.joining("\n", "\n\nhistory:\n", "\n\n"))
         );
+        serviceManager.getTask( 7);
+        serviceManager.getEpicTask(4);
+        // Когда запрашиваем удаленную задачу ее порядок в истории не меняется, то есть меняется порядок 7, 4 и 5 задачи
+        serviceManager.getEpicTask(1);
+        serviceManager.getSubTask(5);
+        System.out.println(serviceManager
+                .getHistory()
+                .stream()
+                .map(Task::toString)
+                .collect(Collectors.joining("\n", "\n\nhistory:\n", "\n\n"))
+        );
 
         serviceManager.clearAllTasks();
         Assertions.assertEquals(0, serviceManager.getAllTasks().size());

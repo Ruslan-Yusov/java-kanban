@@ -62,6 +62,7 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
             }
             task.onDelete();
             tasks.remove(task.getId());
+            historyManager.remove(task.getId());
         }
     }
 
