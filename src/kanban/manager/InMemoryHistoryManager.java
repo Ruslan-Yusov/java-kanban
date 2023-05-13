@@ -10,9 +10,7 @@ public class InMemoryHistoryManager implements HistoryManager<Task> {
 
     @Override
     public void add(Task task) {
-        if (task != null) {
-            history.link(task);
-        }
+        history.link(task);
     }
 
     @Override

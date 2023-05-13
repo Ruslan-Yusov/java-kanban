@@ -24,37 +24,33 @@ public class CustomLinkedList {
     }
 
     public void link(Task task) {
+        if (task == null) {
+            return;
+        }
         if (size == 0) {
             first = new Node(null, task, null);
             last = first;
             size++;
             strangeMap.put(task.getId(), first);
         } else {
-            boolean wasFound = false;
-            for (Node current = first; current != null; current = current.next) {
-                wasFound = current.item == task;
-                if (wasFound && current != last) {
-                    if (current != first) {
-                        Node p = current.prev;
-                        p.next = current.next;
-                    }
-                    Node n = current.next;
-                    n.prev = current.prev;
-                    current.prev = last;
-                    current.next = null;
-                    last.next = current;
-                    last = current;
-                }
-            }
-            if (!wasFound) {
-                Node l = last;
-                Node node = new Node(l, task, null);
-                l.next = node;
-                last = node;
+            Node found = strangeMap.get(task.getId());
+            boolean wasFound = found != null;
+            if (wasFound && found != last) {
+                removeById(task.getId());
+                linkLast(task);
+            } else if (!wasFound) {
+                linkLast(task);
                 size++;
-                strangeMap.put(task.getId(), node);
             }
         }
+    }
+
+    private void linkLast(Task task) {
+        Node l = last;
+        Node node = new Node(l, task, null);
+        l.next = node;
+        last = node;
+        strangeMap.put(task.getId(), node);
     }
 
     public void removeById(int id) {

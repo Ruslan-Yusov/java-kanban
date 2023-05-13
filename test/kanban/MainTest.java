@@ -55,15 +55,18 @@ class MainTest {
 
         Assertions.assertEquals(3, serviceManager.getAllTasks().size());
 
+        // 7 - простая задача, 4 - эпик
         System.out.println(serviceManager.getEpicTask(7));
         Assertions.assertNull(serviceManager.getEpicTask(7));
         System.out.println(serviceManager.getEpicTask(4));
         Assertions.assertEquals(epicTask2, serviceManager.getEpicTask(4));
 
+        // 7 - простая задача, 5 - подзадача
         System.out.println(serviceManager.getSubTask(7));
         Assertions.assertNull(serviceManager.getSubTask(7));
         System.out.println(serviceManager.getSubTask(5));
         Assertions.assertEquals(subTask21, serviceManager.getSubTask(5));
+        // 7 никогда не была запрошена как обычная задача
 
         System.out.println(serviceManager
                 .getHistory()
@@ -84,6 +87,7 @@ class MainTest {
         );
 
         serviceManager.clearAllTasks();
+        System.out.println("Все задачи удалены.");
         Assertions.assertEquals(0, serviceManager.getAllTasks().size());
         System.out.println(serviceManager);
 
