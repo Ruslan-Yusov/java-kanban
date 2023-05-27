@@ -1,17 +1,16 @@
 package kanban.manager;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kanban.tasks.*;
-import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Getter
 public class InMemoryTaskManager implements TaskManager<Task, Integer> {
-    public static final int HISTORY_SIZE = 10;
-    private final Map<Integer, Task> tasks = new TreeMap<>();
+    protected Map<Integer, Task> tasks = new TreeMap<>();
+    @JsonIgnore
     private int currentId = 1;
-    private final HistoryManager<Task> historyManager;
+    protected HistoryManager<Task> historyManager;
 
     public InMemoryTaskManager(HistoryManager<Task> historyManager) {
         this.historyManager = historyManager;

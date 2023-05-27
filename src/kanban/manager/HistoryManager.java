@@ -9,4 +9,6 @@ public interface HistoryManager<T> {
     List<T> getHistory();
 
     void remove (int id);
+
+    void clear();
 }

@@ -1,19 +1,26 @@
 package kanban;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import kanban.manager.FileBackedTasksManager;
 import kanban.manager.Managers;
 import kanban.manager.TaskManager;
 import kanban.tasks.EpicTask;
 import kanban.tasks.Status;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 class MainTest {
     @Test
-    void main() {
+    void oneManagerTest() {
         TaskManager<Task, Integer> serviceManager = Managers.getDefault(Managers.getDefaultHistory());
         EpicTask epicTask1 = new EpicTask("epic1", " ", Status.NEW);
         EpicTask epicTask2 = new EpicTask("epic2", " ", Status.NEW);
@@ -72,9 +79,9 @@ class MainTest {
                 .getHistory()
                 .stream()
                 .map(Task::toString)
-                .collect(Collectors.joining("\n", "\n\nhistory:\n", "\n\n"))
+                .collect(Collectors.joining("\n", "\n\nИстория действий:\n---------------:\n", "\n\n"))
         );
-        serviceManager.getTask( 7);
+        serviceManager.getTask(7);
         serviceManager.getEpicTask(4);
         // Когда запрашиваем удаленную задачу ее порядок в истории не меняется, то есть меняется порядок 7, 4 и 5 задачи
         serviceManager.getEpicTask(1);
@@ -83,13 +90,102 @@ class MainTest {
                 .getHistory()
                 .stream()
                 .map(Task::toString)
-                .collect(Collectors.joining("\n", "\n\nhistory:\n", "\n\n"))
+                .collect(Collectors.joining("\n", "\n\nИстория действий:\n---------------:\n", "\n\n"))
         );
-
         serviceManager.clearAllTasks();
         System.out.println("Все задачи удалены.");
         Assertions.assertEquals(0, serviceManager.getAllTasks().size());
         System.out.println(serviceManager);
 
+    }
+
+    private static class TaskList extends ArrayList<Task> {
+        public static TaskList of(Task task) {
+            TaskList taskList = new TaskList();
+            taskList.add(task);
+            return taskList;
+        }
+    }
+
+    @Test
+    void testMapper() {
+        ObjectMapper objectMapper = getObjectMapper();
+        Task task1 = new Task(123, "name", "dsc", Status.NEW);
+        String json1;
+        try {
+            json1 = objectMapper.writeValueAsString(task1);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            TaskList list = TaskList.of(task1);
+            json1 = objectMapper.writeValueAsString(list);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String json2 = "{\"TaskList\":[{\"Task\":{\"id\":745,\"name\":\"name745\",\"description\":\"dsc\",\"status\":\"NEW\"}}]}";
+        TaskList taskList2 = null;
+        try {
+            taskList2 = objectMapper.readValue(json2, TaskList.class);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        Assertions.assertNotNull(taskList2);
+        Assertions.assertNotNull(taskList2.get(0));
+        Assertions.assertEquals(745, taskList2.get(0).getId());
+        Assertions.assertEquals("name745", taskList2.get(0).getName());
+    }
+
+    @NotNull
+    private static ObjectMapper getObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES);
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        objectMapper.findAndRegisterModules();
+        return objectMapper;
+    }
+
+    @Test
+    void twoManagersTest() {
+        TaskManager<Task, Integer> taskManager1 = Managers.getFileTaskManager(Managers.getDefaultHistory());
+        EpicTask epicTask1 = new EpicTask("epic1", " ", Status.NEW);
+        EpicTask epicTask2 = new EpicTask("epic2", " ", Status.NEW);
+        SubTask subTask11 = new SubTask("subTask1.1", " ", Status.NEW, epicTask1);
+        SubTask subTask12 = new SubTask("subTask1.2", " ", Status.NEW, epicTask1);
+        SubTask subTask21 = new SubTask("subTask2.1", "", Status.NEW, epicTask2);
+        Task task3 = new Task("task3", "", Status.NEW);
+        Task task4 = new Task("task4", "", Status.NEW);
+        taskManager1.addTasks(epicTask1, subTask11, subTask12, epicTask2, subTask21, task3, task4);
+        System.out.println(taskManager1);
+
+        taskManager1.getTask(6);
+        taskManager1.getEpicTask(4);
+        taskManager1.getSubTask(2);
+        System.out.println(taskManager1
+                .getHistory()
+                .stream()
+                .map(Task::toString)
+                .collect(Collectors.joining("\n", "\n\nИстория действий (1):\n---------------:\n", "\n\n"))
+        );
+
+        TaskManager<Task, Integer> taskManager2 = FileBackedTasksManager.restoreFromFile(Managers.DEFAULT_TASK_MANAGER_FILE);
+        System.out.println(taskManager2);
+        System.out.println(taskManager1
+                .getHistory()
+                .stream()
+                .map(Task::toString)
+                .collect(Collectors.joining("\n", "\n\nИстория действий (2):\n---------------\n", "\n\n"))
+        );
+
+
+        Assertions.assertNotNull(taskManager2);
+        Assertions.assertNotNull(taskManager2.getAllTasks());
+        Assertions.assertEquals(
+                taskManager1.getAllTasks().stream().map(Object::toString).collect(Collectors.joining(",")),
+                taskManager2.getAllTasks().stream().map(Object::toString).collect(Collectors.joining(","))
+        );
     }
 }

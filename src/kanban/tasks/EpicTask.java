@@ -1,5 +1,9 @@
 package kanban.tasks;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -8,12 +12,25 @@ import java.util.Set;
 
 @Getter
 @ToString(callSuper = true)
+@JsonTypeName("EpicTask")
 public class EpicTask extends Task implements ParentTask<SubTask> {
 
+    @JsonIgnore
+    // Цикличность ссылок разорвана для сериализации:
+    // * со стороны EpicTask нет ссылок на подзадачи
     private final Set<SubTask> subTasks = new HashSet<>();
 
     public EpicTask(String name, String description, Status status) {
         super(name, description, status);
+    }
+
+    @JsonCreator
+    public EpicTask(
+            @JsonProperty("id") int id,
+            @JsonProperty("name") String name,
+            @JsonProperty("description") String description,
+            @JsonProperty("status") Status status) {
+        super(id, name, description, status);
     }
 
     @Override

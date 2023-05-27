@@ -73,6 +73,13 @@ public class CustomLinkedList {
         }
     }
 
+    public void clear() {
+        strangeMap.clear();
+        first = null;
+        last = null;
+        size = 0;
+    }
+
     private static class Node {
         private final Task item;
         private Node next;
