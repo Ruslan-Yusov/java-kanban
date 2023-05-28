@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class InMemoryTaskManager implements TaskManager<Task, Integer> {
     protected Map<Integer, Task> tasks = new TreeMap<>();
     @JsonIgnore
-    private int currentId = 1;
+    protected int currentId = 1;
     protected HistoryManager<Task> historyManager;
 
     public InMemoryTaskManager(HistoryManager<Task> historyManager) {

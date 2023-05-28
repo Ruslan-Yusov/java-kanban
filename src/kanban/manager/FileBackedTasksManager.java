@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import kanban.manager.exception.ManagerRestoreException;
+import kanban.manager.exception.ManagerSaveException;
 import kanban.tasks.EpicTask;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
@@ -16,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -58,7 +62,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         try {
             String data = Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
             if (data.isBlank()) {
-                throw new ManagerRestoreException(null);
+                throw new ManagerRestoreException();
             }
             return mapper.readValue(data, FileBackedTasksManager.class);
         } catch (IOException e) {
@@ -110,8 +114,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @JsonCreator
     public FileBackedTasksManager(
-            @JsonProperty("tasks") TaskList tasks,
-            @JsonProperty("history") TaskIdList historyIds
+            @JsonProperty("tasks")
+            @JsonDeserialize(as=ArrayList.class, contentAs=Task.class)
+            List<Task> tasks,
+            @JsonProperty("history")
+            List<Integer> historyIds
     ) {
         // Конструктор для десериализации
         super(new InMemoryHistoryManager());
@@ -121,7 +128,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         if (tasks != null) {
             tasks.forEach(task -> this.tasks.put(task.getId(), task));
         }
-        // Для консистентности надо восстановить связи между эпиками и подзадачами
+        // Для консистентность надо восстановить связи между эпиками и подзадачами
         this.tasks.values().stream()
                 .filter(SubTask.class::isInstance)
                 .map(SubTask.class::cast)
@@ -130,8 +137,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         if (historyIds != null) {
             historyIds.stream().map(id -> this.tasks.get(id)).filter(Objects::nonNull).forEach(this.historyManager::add);
         }
+        // Инициализация значения счетчика.
+        // В постановке нет про восстановление счетчика. Сделано по требованию ревью.
+        this.currentId = this.tasks.keySet().stream().max(Comparator.naturalOrder()).orElse(1);
     }
-
 
     private static ObjectMapper jsonMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -143,9 +152,4 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return objectMapper;
     }
 
-    private static class TaskList extends ArrayList<Task> {
-    }
-
-    private static class TaskIdList extends ArrayList<Integer> {
-    }
 }
