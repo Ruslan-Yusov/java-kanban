@@ -11,6 +11,7 @@ import kanban.manager.exception.ManagerSaveException;
 import kanban.tasks.EpicTask;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
+import lombok.Setter;
 
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -25,6 +26,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
+    @Setter
     private String filePath;
     public static final ObjectMapper mapper = jsonMapper();
 
@@ -126,7 +128,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         // * со стороны SubTask не ссылка на эпик, а EpicTaskId
         // * со стороны EpicTask нет ссылок на подзадачи
         if (tasks != null) {
-            tasks.forEach(task -> this.tasks.put(task.getId(), task));
+            tasks.forEach(task -> {
+                this.tryAddTaskByStart(task); // can occure runtime error!
+                this.tasks.put(task.getId(), task);
+            });
         }
         // Для консистентность надо восстановить связи между эпиками и подзадачами
         this.tasks.values().stream()

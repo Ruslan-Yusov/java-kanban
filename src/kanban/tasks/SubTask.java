@@ -1,13 +1,13 @@
 package kanban.tasks;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @ToString(callSuper = true, exclude = {"epicTask"})
 @JsonTypeName("SubTask")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SubTask extends Task {
     @JsonIgnore
     // Цикличность ссылок разорвана для сериализации:
@@ -18,6 +18,11 @@ public class SubTask extends Task {
 
     public SubTask(String name, String description, Status status, EpicTask epicTask) {
         super(name, description, status);
+        setEpicTask(epicTask);
+    }
+
+    public SubTask(String name, String description, Status status, Long duration, LocalDateTime startTime, EpicTask epicTask) {
+        super(name, description, status, duration, startTime);
         setEpicTask(epicTask);
     }
 

@@ -1,18 +1,19 @@
 package kanban.tasks;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
 @ToString(callSuper = true)
 @JsonTypeName("EpicTask")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EpicTask extends Task implements ParentTask<SubTask> {
 
     @JsonIgnore
@@ -61,5 +62,34 @@ public class EpicTask extends Task implements ParentTask<SubTask> {
     public void onDelete() {
         subTasks.clear();
         updateStatus();
+    }
+
+    @Override
+    @JsonIgnore
+    public Long getDuration() {
+        return subTasks.stream()
+                .map(SubTask::getDuration)
+                .filter(Objects::nonNull)
+                .reduce(0L, Long::sum);
+    }
+
+    @Override
+    @JsonIgnore
+    public LocalDateTime getStartTime() {
+        return subTasks.stream()
+                .map(SubTask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(Comparator.naturalOrder())
+                .orElse(null);
+    }
+
+    @Override
+    @JsonIgnore
+    public LocalDateTime getEndTime() {
+        return subTasks.stream()
+                .map(SubTask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
     }
 }

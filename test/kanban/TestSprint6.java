@@ -1,5 +1,6 @@
 package kanban;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-class MainTest {
+class TestSprint6 {
     @Test
     void oneManagerTest() {
         TaskManager<Task, Integer> serviceManager = Managers.getDefault(Managers.getDefaultHistory());
@@ -151,19 +152,28 @@ class MainTest {
     @Test
     void twoManagersTest() {
         TaskManager<Task, Integer> taskManager1 = Managers.getFileTaskManager(Managers.getDefaultHistory());
+
+        Task baseTask = new Task("baseTask", " ", Status.NEW);
         EpicTask epicTask1 = new EpicTask("epic1", " ", Status.NEW);
+        Task subTask11 = new SubTask("subTask_1.1", "", Status.NEW, epicTask1);
+        Task subTask12 = new SubTask("subTask_1.2", "", Status.NEW, epicTask1);
         EpicTask epicTask2 = new EpicTask("epic2", " ", Status.NEW);
-        SubTask subTask11 = new SubTask("subTask1.1", " ", Status.NEW, epicTask1);
-        SubTask subTask12 = new SubTask("subTask1.2", " ", Status.NEW, epicTask1);
-        SubTask subTask21 = new SubTask("subTask2.1", "", Status.NEW, epicTask2);
-        Task task3 = new Task("task3", "", Status.NEW);
-        Task task4 = new Task("task4", "", Status.NEW);
-        taskManager1.addTasks(epicTask1, subTask11, subTask12, epicTask2, subTask21, task3, task4);
+        Task subTask21 = new SubTask("subTask_2.1", "", Status.NEW, epicTask2);
+        Task subTask22 = new SubTask("subTask_2.2", "", Status.NEW, epicTask2);
+        taskManager1.addTasks(
+                baseTask,
+                epicTask1,
+                subTask11,
+                subTask12,
+                epicTask2,
+                subTask21,
+                subTask22
+        );
         System.out.println(taskManager1);
 
-        taskManager1.getTask(6);
-        taskManager1.getEpicTask(4);
-        taskManager1.getSubTask(2);
+        taskManager1.getTask(1);
+        taskManager1.getEpicTask(2);
+        taskManager1.getSubTask(4);
         System.out.println(taskManager1
                 .getHistory()
                 .stream()
@@ -183,9 +193,13 @@ class MainTest {
 
         Assertions.assertNotNull(taskManager2);
         Assertions.assertNotNull(taskManager2.getAllTasks());
-        Assertions.assertEquals(
-                taskManager1.getAllTasks().stream().map(Object::toString).collect(Collectors.joining(",")),
-                taskManager2.getAllTasks().stream().map(Object::toString).collect(Collectors.joining(","))
-        );
+        ObjectMapper om = getObjectMapper();
+        try {
+            Assertions.assertEquals(
+                    om.writeValueAsString(taskManager1.getAllTasks()),
+                    om.writeValueAsString(taskManager2.getAllTasks()));
+        } catch (JsonProcessingException e) {
+            System.out.println("JsonProcessingException !!!");
+        }
     }
 }

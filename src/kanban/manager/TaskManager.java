@@ -153,4 +153,9 @@ public interface TaskManager<T, N extends Number> {
      * @return последние просмотренные задачи
      */
     List<T> getHistory();
+
+    /**
+     * Вывод задач повремени начала.
+     */
+    List<T> getPrioritizedTasks();
 }

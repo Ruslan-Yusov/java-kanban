@@ -2,6 +2,12 @@ package kanban.tasks;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.time.LocalDateTime;
+import java.util.Comparator;
+
+import static java.util.Optional.ofNullable;
 
 @Data
 @JsonTypeInfo(
@@ -11,17 +17,33 @@ import lombok.*;
         @JsonSubTypes.Type(value = SubTask.class, name = "SubTask"),
         @JsonSubTypes.Type(value = EpicTask.class, name = "EpicTask")
 })
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task {
+
+    @JsonIgnore
+    public static final Comparator<Task> COMPARATOR_BY_START =
+            Comparator.nullsLast(Comparator.comparing(Task::getStartTime));
 
     private Integer id;
     private String name;
     private String description;
     private Status status;
+    private Long duration; // продолжительность задачи, оценка того, сколько времени она займёт в минутах (число);
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
+    private LocalDateTime startTime; // дата, когда предполагается приступить к выполнению задачи.
 
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
         this.status = status;
+    }
+
+    public Task(String name, String description, Status status, Long duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     @JsonCreator
@@ -44,5 +66,12 @@ public class Task {
     public int hashCode() {
         // В момент создания задачи у нее нет id, есть эпик, нельзя задачу без хеша добавить в хеш сет подзадач в эпике
         return id != null ? id : name.hashCode();
+    }
+
+    @JsonIgnore
+    public LocalDateTime getEndTime() {
+        return ofNullable(startTime)
+                .flatMap(st -> ofNullable(duration).map(st::plusMinutes))
+                .orElse(null);
     }
 }

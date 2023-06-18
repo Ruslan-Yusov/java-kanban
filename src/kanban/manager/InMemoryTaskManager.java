@@ -1,15 +1,21 @@
 package kanban.manager;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kanban.manager.exception.IntersectedTaskException;
+import kanban.manager.exception.UnknownTaskException;
 import kanban.tasks.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
+
 public class InMemoryTaskManager implements TaskManager<Task, Integer> {
     protected Map<Integer, Task> tasks = new TreeMap<>();
+    protected Map<LocalDateTime, Task> oneMoreMapByStart = new TreeMap<>();
     @JsonIgnore
-    protected int currentId = 1;
+    protected int currentId = 0;
     protected HistoryManager<Task> historyManager;
 
     public InMemoryTaskManager(HistoryManager<Task> historyManager) {
@@ -23,7 +29,7 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
      */
 
     private int getNextId() {
-        return currentId++;
+        return ++currentId;
     }
 
     @Override
@@ -66,10 +72,13 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
                 ((EpicTask) task)
                         .getSubTasks()
                         .stream()
-                        .map(Task::getId)
-                        .forEach(this.tasks::remove);
+                        .forEach(t -> {
+                            this.tryRemoveTaskByStart(t);
+                            this.tasks.remove(t.getId());
+                        });
             }
             task.onDelete();
+            tryRemoveTaskByStart(task);
             tasks.remove(task.getId());
             historyManager.remove(task.getId());
         }
@@ -106,23 +115,33 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
 
     @Override
     public void clearTasks() {
-        tasks.values().stream().filter(t -> Task.class.equals(t.getClass())).forEach(this::deleteAnyTask);
+        List<Task> toDeleteList = tasks.values().stream()
+                .filter(t -> Task.class.equals(t.getClass()))
+                .collect(Collectors.toList());
+        toDeleteList.forEach(this::deleteAnyTask);
     }
 
     @Override
     public void clearSubTasks() {
-        tasks.values().stream().filter(SubTask.class::isInstance).forEach(this::deleteAnyTask);
+        List<Task> toDeleteList = tasks.values().stream()
+                .filter(SubTask.class::isInstance)
+                .collect(Collectors.toList());
+        toDeleteList.forEach(this::deleteAnyTask);
     }
 
     @Override
     public void clearEpicTasks() {
-        tasks.values().stream().filter(EpicTask.class::isInstance).forEach(this::deleteAnyTask);
+        List<Task> toDeleteList = tasks.values().stream()
+                .filter(EpicTask.class::isInstance)
+                .collect(Collectors.toList());
+        toDeleteList.forEach(this::deleteAnyTask);
     }
 
     @Override
     public void addTask(Task task) {
         int index = getNextId();
         task.setId(index);
+        tryAddTaskByStart(task);
         tasks.put(index, task);
     }
 
@@ -139,37 +158,39 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
 
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
+            tryRemoveTaskByStart(tasks.get(task.getId()));
+            tryAddTaskByStart(task);
             tasks.put(task.getId(), task);
         } else {
-            throwError();
+            throw new UnknownTaskException();
         }
-    }
-
-    private static void throwError() {
-        throw new IllegalArgumentException("Неизвестная задача");
     }
 
     @Override
     public <E extends Task> void updateEpicTask(E epicTask) {
         if (tasks.containsKey(epicTask.getId())) {
+            tryRemoveTaskByStart(tasks.get(epicTask.getId()));
+            tryAddTaskByStart(epicTask);
             tasks.put(epicTask.getId(), epicTask);
         } else {
-            throwError();
+            throw new UnknownTaskException();
         }
     }
 
     @Override
     public <S extends Task> void updateSubTask(S subTask) {
         if (tasks.containsKey(subTask.getId())) {
+            tryRemoveTaskByStart(tasks.get(subTask.getId()));
+            tryAddTaskByStart(subTask);
             tasks.put(subTask.getId(), subTask);
         } else {
-            throwError();
+            throw new UnknownTaskException();
         }
     }
 
     @Override
     public <E extends ParentTask<? extends Task>> List<SubTask> getSubTasks(E epicTask) {
-        return Optional.ofNullable(epicTask)
+        return ofNullable(epicTask)
                 .map(ParentTask::getSubTasks)
                 .map(set -> set.stream().map(SubTask.class::cast).collect(Collectors.toList()))
                 .orElseGet(Collections::emptyList);
@@ -201,6 +222,12 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
     }
 
     @Override
+    @JsonIgnore
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(oneMoreMapByStart.values());
+    }
+
+    @Override
     public String toString() {
         return tasks
                 .values()
@@ -208,5 +235,27 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
                 .map(Task::toString)
                 .collect(Collectors
                         .joining("\n", "задачи:\n", "\n------\n"));
+    }
+
+    protected void tryAddTaskByStart(Task task) {
+        LocalDateTime startTime = task.getStartTime();
+        if (startTime != null) {
+            // не добавлять в список по датам
+            Task foundTask = oneMoreMapByStart.get(startTime);
+            if (foundTask == null) {
+                oneMoreMapByStart.put(startTime, task);
+            } else if (task instanceof SubTask
+                    && foundTask instanceof EpicTask
+                    && ((SubTask) task).getEpicTaskId().equals(foundTask.getId())
+            ) {
+                // not an error
+            } else {
+                throw new IntersectedTaskException();
+            }
+        }
+    }
+
+    protected void tryRemoveTaskByStart(Task task) {
+        ofNullable(task.getStartTime()).ifPresent(oneMoreMapByStart::remove);
     }
 }
