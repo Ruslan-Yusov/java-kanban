@@ -1,18 +1,8 @@
 package kanban.sprint7;
 
 import kanban.manager.FileBackedTasksManager;
-import kanban.manager.InMemoryTaskManager;
 import kanban.manager.Managers;
-import kanban.tasks.EpicTask;
-import kanban.tasks.Status;
-import kanban.tasks.SubTask;
-import kanban.tasks.Task;
 import org.junit.jupiter.api.BeforeEach;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class TaskManagerFileBackedTest extends TaskManagerTest<FileBackedTasksManager> {
 

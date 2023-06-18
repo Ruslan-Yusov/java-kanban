@@ -7,7 +7,6 @@ import kanban.tasks.Status;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class TaskManagerInMemoryTest extends TaskManagerTest<InMemoryTaskManager> {
     @BeforeEach

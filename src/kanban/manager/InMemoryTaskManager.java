@@ -6,6 +6,7 @@ import kanban.manager.exception.UnknownTaskException;
 import kanban.tasks.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,7 +72,6 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
             if (task instanceof EpicTask) {
                 ((EpicTask) task)
                         .getSubTasks()
-                        .stream()
                         .forEach(t -> {
                             this.tryRemoveTaskByStart(t);
                             this.tasks.remove(t.getId());
@@ -243,16 +243,35 @@ public class InMemoryTaskManager implements TaskManager<Task, Integer> {
             // не добавлять в список по датам
             Task foundTask = oneMoreMapByStart.get(startTime);
             if (foundTask == null) {
-                oneMoreMapByStart.put(startTime, task);
-            } else if (task instanceof SubTask
-                    && foundTask instanceof EpicTask
-                    && ((SubTask) task).getEpicTaskId().equals(foundTask.getId())
-            ) {
-                // not an error
+                if (task instanceof EpicTask) {
+                    // ignore
+                    // Sonar не прав, удалять нельзя.
+                } else {
+                    checkIntersections(task);
+                    oneMoreMapByStart.put(startTime, task);
+                }
             } else {
                 throw new IntersectedTaskException();
             }
         }
+    }
+
+    private void checkIntersections(Task task) {
+        for (Task t: getAllTasks()) {
+            if (!(t instanceof EpicTask) && checkIntersection(task, t)) {
+                throw new IntersectedTaskException();
+            }
+        }
+    }
+
+    private boolean checkIntersection(Task task, Task otherTask) {
+        return Math.max(
+                task.getStartTime().toInstant(ZoneOffset.UTC).getEpochSecond(),
+                otherTask.getStartTime().toInstant(ZoneOffset.UTC).getEpochSecond()
+        ) < Math.min(
+                task.getEndTime().toInstant(ZoneOffset.UTC).getEpochSecond(),
+                otherTask.getEndTime().toInstant(ZoneOffset.UTC).getEpochSecond()
+        );
     }
 
     protected void tryRemoveTaskByStart(Task task) {

@@ -52,7 +52,7 @@ abstract class TaskManagerTest<T extends TaskManager<Task, Integer>> {
     }
     
     @Test
-    @DisplayName("Тестирование всех методов интерфейса")
+    @DisplayName("Тестирование всех методов интерфейса (1)")
     public void testAll() {
 
         Task foundTask = taskManager.getTask(TASK_ID);
@@ -84,17 +84,23 @@ abstract class TaskManagerTest<T extends TaskManager<Task, Integer>> {
         taskManager.clearEpicTasks();
         foundEpicTask = taskManager.getEpicTask(EPIC_2_ID);
         Assertions.assertNull(foundEpicTask);
+        taskManager.clearAllTasks();
+    }
 
+    @Test
+    @DisplayName("Тестирование всех методов интерфейса (2)")
+    public void testAllP2() {
         taskManager.clearAllTasks();
         Assertions.assertNotNull(taskManager.getAllTasks());
         Assertions.assertEquals(0, taskManager.getAllTasks().size());
-        foundSubTask = taskManager.getSubTask(EPIC_SUBTASK_11_ID);
+
+        Task foundSubTask = taskManager.getSubTask(EPIC_SUBTASK_11_ID);
         Assertions.assertNull(foundSubTask);
         foundSubTask = taskManager.getSubTask(EPIC_SUBTASK_21_ID);
         Assertions.assertNull(foundSubTask);
-        foundEpicTask = taskManager.getEpicTask(EPIC_2_ID);
+        Task foundEpicTask = taskManager.getEpicTask(EPIC_2_ID);
         Assertions.assertNull(foundEpicTask);
-        foundTask = taskManager.getTask(TASK_ID);
+        Task foundTask = taskManager.getTask(TASK_ID);
         Assertions.assertNull(foundTask);
 
         EpicTask epicTask = new EpicTask("name", "description", Status.NEW);

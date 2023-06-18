@@ -2,6 +2,7 @@ package kanban.sprint7;
 
 import kanban.manager.Managers;
 import kanban.manager.TaskManager;
+import kanban.manager.exception.IntersectedTaskException;
 import kanban.tasks.EpicTask;
 import kanban.tasks.Status;
 import kanban.tasks.SubTask;
@@ -60,6 +61,14 @@ class TestSprint7 {
     private static final Long DURATION_1 = 120L;
     private static final Long DURATION_2 = 180L;
     private static final Long DURATION_EPIC = 300L;
+    private static final LocalDateTime START_ERR_1 = LocalDateTime.parse("2000-01-01 01:00:00", FORMATTER);
+    private static final LocalDateTime START_ERR_2 = LocalDateTime.parse("1999-12-31 23:45:00", FORMATTER);
+    private static final LocalDateTime START_ERR_3 = LocalDateTime.parse("2000-01-01 01:45:00", FORMATTER);
+    private static final LocalDateTime START_ERR_4 = LocalDateTime.parse("2000-01-01 03:00:00", FORMATTER);
+    private static final Long DURATION_ERR_1 = 30L;
+    private static final Long DURATION_ERR_2 = 30L;
+    private static final Long DURATION_ERR_3 = 30L;
+    private static final Long DURATION_ERR_4 = 30L;
 
     @BeforeEach
     public void beforeEach() {
@@ -134,6 +143,37 @@ class TestSprint7 {
         Assertions.assertNull(epicTask1.getEndTime());
         Assertions.assertEquals(0, epicTask1.getDuration());
 
+        printByStart();
+
+        Assertions.assertThrowsExactly(
+                IntersectedTaskException.class,
+                () -> serviceManager.addTask(
+                        new Task("errorTask", "", Status.NEW, DURATION_ERR_1, START_ERR_1)
+                )
+        );
+
+        Assertions.assertThrowsExactly(
+                IntersectedTaskException.class,
+                () -> serviceManager.addTask(
+                        new Task("errorTask", "", Status.NEW, DURATION_ERR_2, START_ERR_2)
+                )
+        );
+
+        Assertions.assertThrowsExactly(
+                IntersectedTaskException.class,
+                () -> serviceManager.addTask(
+                        new Task("errorTask", "", Status.NEW, DURATION_ERR_3, START_ERR_3)
+                )
+        );
+
+        // no error should be
+        serviceManager.addTask(
+                        new Task("errorTask", "", Status.NEW, DURATION_ERR_4, START_ERR_4)
+                );
+        printByStart();
+    }
+
+    private void printByStart() {
         System.out.println(serviceManager
                 .getPrioritizedTasks()
                 .stream()
