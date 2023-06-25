@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: java-kanban
+  jackson:
+    deserialization:
+      accept-empty-string-as-null-object: true
+
+
+application:
+  kvserver:
+    url: http://localhost:8078
+    port: 8078

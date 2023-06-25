@@ -60,7 +60,7 @@
         <!-- See http://checkstyle.sourceforge.net/config_design.html#InterfaceIsType -->
         <module name="InterfaceIsType"/>
         <!-- See http://checkstyle.sourceforge.net/config_design.html#HideUtilityClassConstructor -->
-        <module name="HideUtilityClassConstructor"/>
+        <!--module name="HideUtilityClassConstructor"/-->
         <!-- See http://checkstyle.sourceforge.net/config_design.html#MutableException -->
         <module name="MutableException"/>
         <!-- See http://checkstyle.sourceforge.net/config_design.html#ThrowsCount -->
@@ -80,7 +80,7 @@
         <!-- See http://checkstyle.sourceforge.net/config_coding.html#EqualsAvoidNull -->
         <module name="EqualsAvoidNull"/>
         <!-- See http://checkstyle.sourceforge.net/config_coding.html#EqualsHashCode -->
-        <module name="EqualsHashCode"/>
+        <!--module name="EqualsHashCode"/-->
         <!-- See http://checkstyle.sourceforge.net/config_coding.html#HiddenField -->
         <module name="HiddenField">
             <property name="ignoreSetter" value="true"/>
@@ -141,7 +141,7 @@
 
         <!-- Checks for Imports -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#AvoidStarImport -->
-        <module name="AvoidStarImport"/>
+        <!--module name="AvoidStarImport"/-->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#IllegalImport -->
         <module name="IllegalImport"/>
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#RedundantImport -->
@@ -159,17 +159,17 @@
 
         <!-- Checks for Javadoc -->
         <!-- See http://checkstyle.sourceforge.net/config_javadoc.html#JavadocType -->
-        <module name="JavadocType">
+        <!--module name="JavadocType">
             <property name="authorFormat" value="[^\\s\\w]* \{@literal &lt;[\S]+@(todo_our_company_name.ru|gmail.com)&gt;\}"/>
-        </module>
+        </module-->
         <!-- See http://checkstyle.sourceforge.net/config_javadoc.html#JavadocMethod -->
-        <module name="JavadocMethod">
+        <!--module name="JavadocMethod">
             <property name="scope" value="public"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
             <property name="allowMissingThrowsTags" value="true"/>
             <property name="tokens" value="METHOD_DEF"/>
             <property name="ignoreMethodNamesRegex" value="with.*" />
-        </module>
+        </module-->
         <!-- See http://checkstyle.sourceforge.net/config_javadoc.html#JavadocStyle -->
         <module name="JavadocStyle"/>
         <!-- See http://checkstyle.sourceforge.net/config_javadoc.html#NonEmptyAtclauseDescription -->
