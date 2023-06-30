@@ -5,6 +5,7 @@ import kanban.manager.tasks.*;
 import kanban.service.dto.TaskDto;
 import kanban.service.dto.TaskDtoForCreate;
 import kanban.service.dto.TaskListDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TaskManagerService {
-    @Autowired
-    private DtoMapper mapper;
+    private final DtoMapper mapper;
 
-    @Autowired
-    private TaskManager<Task, Integer> taskManager;
+    private final TaskManager<Task, Integer> taskManager;
 
     public TaskListDto getTasks() {
         List<? extends Task> allTasks = taskManager.getAllTasks();

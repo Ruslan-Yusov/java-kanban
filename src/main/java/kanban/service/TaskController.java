@@ -3,12 +3,12 @@ package kanban.service;
 import kanban.service.dto.TaskDto;
 import kanban.service.dto.TaskDtoForCreate;
 import kanban.service.dto.TaskListDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 @RestController
+@RequiredArgsConstructor
 public class TaskController {
-    @Autowired
-    private TaskManagerService taskManagerService;
+    private final TaskManagerService taskManagerService;
     @GetMapping("/tasks/task")
     public TaskListDto getTasks() {
         return taskManagerService.getTasks();

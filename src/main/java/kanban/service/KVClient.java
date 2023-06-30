@@ -2,6 +2,7 @@ package kanban.service;
 
 import kanban.manager.ServerBackedTasksManager;
 import kanban.manager.exception.ManagerRestoreException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -13,12 +14,12 @@ import java.net.URI;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class KVClient {
     @Value("${application.kvserver.url}")
     private String url;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public String get() {
         return execute("load", HttpMethod.GET, Void.class, String.class, null)
